@@ -3,10 +3,12 @@ import {
   hatchDigipet,
   trainDigipet,
   walkDigipet,
+  ignoreDigipet,
+  rehomeDigipet
 } from "./controller";
 import { getDigipet, INITIAL_DIGIPET, setDigipet } from "./model";
 
-describe.skip("feedDigipet", () => {
+describe("feedDigipet", () => {
   it("increases digipet nutrition by 10 and decreases discipline by 5", () => {
     // setup
     setDigipet(INITIAL_DIGIPET);
@@ -68,7 +70,7 @@ describe("hatchDigipet", () => {
   });
 });
 
-describe.skip("trainDigipet", () => {
+describe("trainDigipet", () => {
   it("increases digipet discipline by 10 and decreases happiness by 5", () => {
     // setup
     setDigipet(INITIAL_DIGIPET);
@@ -145,5 +147,59 @@ describe("walkDigipet", () => {
 
     // assert
     expect(getDigipet()).toHaveProperty("nutrition", 0);
+  });
+});
+
+describe("ignoreDigipet", () => {
+  it("decreases all digipet by 10", () => {
+    // setup
+    setDigipet(INITIAL_DIGIPET);
+    expect(getDigipet()).toStrictEqual(INITIAL_DIGIPET);
+
+    // act
+    ignoreDigipet();
+
+    // assert
+    expect(getDigipet()).toStrictEqual({
+      happiness: INITIAL_DIGIPET.happiness - 10,
+      nutrition: INITIAL_DIGIPET.nutrition - 10,
+      discipline: INITIAL_DIGIPET.discipline - 10,
+    });
+  });
+
+
+  it("cannot decrease happiness below 0", () => {
+    // setup
+    setDigipet({ happiness: 0, nutrition: 0, discipline: 0 });
+
+    // act
+    ignoreDigipet();
+
+    // assert
+    expect(getDigipet()).toHaveProperty("nutrition", 0);
+    expect(getDigipet()).toHaveProperty("happiness", 0);
+    expect(getDigipet()).toHaveProperty("discipline", 0);
+  });
+});
+
+describe("rehomeDigipet", () => {
+  test("when there is a current digipet, it sets the user's digipet to undefined and returns it", () => {
+    // setup
+    setDigipet(INITIAL_DIGIPET);
+
+    // act
+    const digipet = rehomeDigipet();
+
+    // assert
+    expect(digipet).toBe(undefined);
+    expect(getDigipet()).toBe(null);
+  });
+
+  test("when there is no current digipet, it throws an error", () => {
+    // setup
+    setDigipet(undefined);
+
+    // assert error gets thrown
+    expect(() => rehomeDigipet()).toThrowError();
   });
 });
